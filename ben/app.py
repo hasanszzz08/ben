@@ -62,18 +62,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS: allow localhost + Chrome extension
+# CORS: allow localhost + Chrome extension + Vercel
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost",
-        f"http://localhost:{settings.ben_port}",
-        f"http://{settings.ben_host}:{settings.ben_port}",
-        "chrome-extension://*",
-    ],
+    allow_origins=["*"],
     allow_credentials=False,
-    allow_methods=["GET", "POST", "PATCH", "DELETE"],
-    allow_headers=["Content-Type", "Accept"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 # ---------------------------------------------------------------------------

@@ -114,9 +114,9 @@ class Settings(BaseSettings):
     ben_host: str = Field(default="127.0.0.1", validation_alias="BEN_HOST")
     ben_port: int = Field(default=8000, validation_alias="BEN_PORT")
 
-    # Data directory for SQLite memory and logs
+    # Data directory for SQLite memory and logs (auto-selects /tmp/data on Vercel)
     ben_data_dir: Path = Field(
-        default=PROJECT_ROOT / "data",
+        default=Path(os.getenv("BEN_DATA_DIR", "/tmp/data" if os.getenv("VERCEL") else str(PROJECT_ROOT / "data"))),
         description="Directory for local storage (memory DB, logs)"
     )
 

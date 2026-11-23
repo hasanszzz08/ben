@@ -1,7 +1,8 @@
-# BEN - Personal AI Agent Dependencies
+# BEN - Personal AI Agent (Vercel & Web Backend)
 
-# Anthropic Claude API
+# Anthropic Claude & Google Gemini API
 anthropic>=0.40.0
+requests>=2.31.0
 
 # Environment and Configuration
 python-dotenv>=1.0.1
@@ -15,9 +16,6 @@ python-multipart>=0.0.12
 
 # CLI and Logging
 rich>=13.9.0
-
-# Windows Desktop Companion
-PySide6>=6.8.0
 
 # Testing
 pytest>=8.3.0

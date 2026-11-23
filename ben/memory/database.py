@@ -21,7 +21,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
 
-from ben.config import PROJECT_ROOT
+from ben.config import PROJECT_ROOT, settings
 from ben.utils.logger import logger
 
 
@@ -29,7 +29,7 @@ from ben.utils.logger import logger
 # Database location
 # ---------------------------------------------------------------------------
 
-DB_PATH: Path = PROJECT_ROOT / "data" / "ben_memory.db"
+DB_PATH: Path = settings.ben_data_dir / "ben_memory.db"
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 # Thread-local storage for connections

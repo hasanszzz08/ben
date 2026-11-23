@@ -1,0 +1,6 @@
+# BEN Windows Desktop Companion Dependencies
+-r requirements.txt
+PySide6>=6.8.0
+SpeechRecognition>=3.14.0
+pyttsx3>=2.98
+keyboard>=0.13.5

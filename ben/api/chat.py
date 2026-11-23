@@ -68,6 +68,8 @@ MAX_INPUT_CHARS = 32_000
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=MAX_INPUT_CHARS)
     session_id: Optional[str] = None
+    api_key: Optional[str] = None
+    model: Optional[str] = None
 
     @field_validator("message")
     @classmethod
@@ -103,12 +105,15 @@ class StatusResponse(BaseModel):
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _safe_error(exc: Exception) -> str:
+def _safe_error(exc: Exception, client: Optional[AnthropicClientManager] = None) -> str:
     """Return error text with API key redacted."""
     msg = str(exc)
-    key = settings.api_key or ""
-    if key and key in msg:
-        msg = msg.replace(key, "[REDACTED]")
+    keys_to_redact = [settings.api_key]
+    if client and client.api_key:
+        keys_to_redact.append(client.api_key)
+    for k in keys_to_redact:
+        if k and len(k) > 5 and k in msg:
+            msg = msg.replace(k, "[REDACTED]")
     return msg
 
 
@@ -434,12 +439,13 @@ async def list_tools_endpoint():
 # ---------------------------------------------------------------------------
 
 @router.get("/status", response_model=StatusResponse)
-async def get_status():
+async def get_status(api_key: Optional[str] = None):
     """Health and configuration status — safe for browser consumption."""
+    client = AnthropicClientManager(api_key=api_key) if api_key else _client_mgr
     return StatusResponse(
-        status="online" if _client_mgr.is_configured else "unconfigured",
-        model=_client_mgr.default_model,
-        key_configured=_client_mgr.is_configured,
+        status="online" if client.is_configured else "unconfigured",
+        model=client.default_model,
+        key_configured=client.is_configured,
         session_id=_history.session_id,
         message_count=_history.message_count,
     )
@@ -506,8 +512,12 @@ async def stop_generation():
 @router.post("/message", response_model=ChatResponse)
 async def send_message(req: ChatRequest):
     """Single-turn chat: send a message, receive a complete response."""
-    if not _client_mgr.is_configured:
-        raise HTTPException(status_code=503, detail="BEN is not configured. Set ANTHROPIC_API_KEY in .env.")
+    active_client = AnthropicClientManager(api_key=req.api_key, model=req.model) if req.api_key else _client_mgr
+    if not active_client.is_configured:
+        raise HTTPException(
+            status_code=503,
+            detail="BEN is not configured: ANTHROPIC_API_KEY is not set. Please configure ANTHROPIC_API_KEY in your environment variables (or Vercel Project Settings > Environment Variables)."
+        )
 
     async with _request_lock:
         _cancel_event.clear()
@@ -531,7 +541,7 @@ async def send_message(req: ChatRequest):
                 reply=tool_reply,
                 session_id=_history.session_id,
                 message_count=_history.message_count,
-                model=_client_mgr.default_model,
+                model=active_client.default_model,
             )
 
         # Build Claude conversation history with prior context and enriched system instruction
@@ -540,14 +550,14 @@ async def send_message(req: ChatRequest):
 
         try:
             reply_text = await asyncio.to_thread(
-                _client_mgr.generate,
+                active_client.generate,
                 prompt=req.message,
                 system_instruction=sys_instruction,
                 history_override=claude_hist,
             )
             reply_text = reply_text.strip() if reply_text else "(no response)"
         except Exception as exc:
-            error_detail = _safe_error(exc)
+            error_detail = _safe_error(exc, active_client)
             err_msg = _history.add_assistant(f"[Error] {error_detail}", is_error=True)
             await asyncio.to_thread(ConversationStore.save_message, _history.session_id, err_msg)
             logger.error(f"Chat generation failed: {error_detail}")
@@ -567,7 +577,7 @@ async def send_message(req: ChatRequest):
             )
             try:
                 second_reply = await asyncio.to_thread(
-                    _client_mgr.generate,
+                    active_client.generate,
                     prompt=followup_prompt,
                     system_instruction=sys_instruction,
                     history_override=claude_hist + [
@@ -588,15 +598,19 @@ async def send_message(req: ChatRequest):
             reply=reply_text,
             session_id=_history.session_id,
             message_count=_history.message_count,
-            model=_client_mgr.default_model,
+            model=active_client.default_model,
         )
 
 
 @router.post("/stream")
 async def stream_message(req: ChatRequest):
     """Streaming chat: send a message, receive tokens via Server-Sent Events."""
-    if not _client_mgr.is_configured:
-        raise HTTPException(status_code=503, detail="BEN is not configured. Set ANTHROPIC_API_KEY in .env.")
+    active_client = AnthropicClientManager(api_key=req.api_key, model=req.model) if req.api_key else _client_mgr
+    if not active_client.is_configured:
+        raise HTTPException(
+            status_code=503,
+            detail="BEN is not configured: ANTHROPIC_API_KEY is not set. Please configure ANTHROPIC_API_KEY in your environment variables (or Vercel Project Settings > Environment Variables)."
+        )
 
     if _request_lock.locked():
         try:
@@ -653,7 +667,7 @@ async def stream_message(req: ChatRequest):
 
                 def producer():
                     try:
-                        for chunk in _client_mgr.generate_stream(
+                        for chunk in active_client.generate_stream(
                             prompt=req.message,
                             history_override=claude_hist,
                             system_instruction=sys_instruction,
@@ -662,7 +676,7 @@ async def stream_message(req: ChatRequest):
                             if _cancel_event.is_set():
                                 break
                     except Exception as exc:
-                        loop.call_soon_threadsafe(gen_queue.put_nowait, ("error", _safe_error(exc)))
+                        loop.call_soon_threadsafe(gen_queue.put_nowait, ("error", _safe_error(exc, active_client)))
                     finally:
                         loop.call_soon_threadsafe(gen_queue.put_nowait, ("__end__", None))
 
@@ -691,7 +705,7 @@ async def stream_message(req: ChatRequest):
                         await asyncio.to_thread(
                             ConversationStore.update_message_content, assistant_msg.id, full_text
                         )
-                        yield f"data: {json.dumps({'type': 'done', 'session_id': _history.session_id, 'model': _client_mgr.default_model, 'message_count': _history.message_count})}\n\n"
+                        yield f"data: {json.dumps({'type': 'done', 'session_id': _history.session_id, 'model': active_client.default_model, 'message_count': _history.message_count})}\n\n"
                         break
 
                     elif event_type == "token":

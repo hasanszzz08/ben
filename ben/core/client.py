@@ -41,20 +41,59 @@ class AnthropicClientManager:
         model: Optional[str] = None,
         base_url: Optional[str] = None,
     ):
-        self._api_key = api_key if api_key is not None else settings.api_key
-        self._base_url = base_url if base_url is not None else settings.base_url
-        if self.is_gemini:
-            self.default_model = model or "gemini-3.5-flash-lite"
-        else:
-            self.default_model = model or settings.ben_model
+        self._custom_api_key = api_key
+        self._custom_model = model
+        self._custom_base_url = base_url
         self._client: Optional[Anthropic] = None
+
+    @property
+    def _api_key(self) -> Optional[str]:
+        """Effective API key, prioritizing explicit custom key over environment settings."""
+        return self._custom_api_key if self._custom_api_key is not None else settings.api_key
+
+    @_api_key.setter
+    def _api_key(self, value: Optional[str]) -> None:
+        self._custom_api_key = value
+        self._client = None
+
+    @property
+    def api_key(self) -> Optional[str]:
+        return self._api_key
+
+    @property
+    def _base_url(self) -> Optional[str]:
+        """Effective base URL, prioritizing explicit custom URL over environment settings."""
+        return self._custom_base_url if self._custom_base_url is not None else settings.base_url
+
+    @_base_url.setter
+    def _base_url(self, value: Optional[str]) -> None:
+        self._custom_base_url = value
+        self._client = None
+
+    @property
+    def base_url(self) -> Optional[str]:
+        return self._base_url
 
     @property
     def is_gemini(self) -> bool:
         """Check if active key is a Google Gemini API key."""
-        if not self._api_key:
+        k = self.api_key
+        if not k:
             return False
-        return self._api_key.startswith(("AQ.", "AIza", "gemini")) or (self._base_url is None and not self._api_key.startswith("sk-ant"))
+        return k.startswith(("AQ.", "AIza", "gemini"))
+
+    @property
+    def default_model(self) -> str:
+        """Default model identifier based on key type and configuration."""
+        if self._custom_model:
+            return self._custom_model
+        if self.is_gemini:
+            return "gemini-3.5-flash-lite"
+        return settings.ben_model
+
+    @default_model.setter
+    def default_model(self, value: str) -> None:
+        self._custom_model = value
 
     def _gemini_model(self, requested_model: Optional[str] = None) -> str:
         m = requested_model or self.default_model
@@ -65,28 +104,30 @@ class AnthropicClientManager:
     @property
     def is_configured(self) -> bool:
         """Check if a valid, non-empty API key is present."""
-        return bool(self._api_key and self._api_key.strip())
+        k = self.api_key
+        return bool(k and k.strip())
 
     @property
     def key_char_count(self) -> int:
         """Return the character count of the API key without revealing the key."""
-        return len(self._api_key.strip()) if self.is_configured and self._api_key else 0
+        k = self.api_key
+        return len(k.strip()) if k and self.is_configured else 0
 
     @property
     def client(self) -> Anthropic:
         """Get or initialize the official anthropic.Anthropic client."""
         if not self.is_configured:
             raise ValueError(
-                "Anthropic API key is not configured. Please set a valid ANTHROPIC_API_KEY in your .env file."
+                "Anthropic API key is not configured. Please set ANTHROPIC_API_KEY in your environment variables."
             )
         if self._client is None:
             kwargs: Dict[str, Any] = {
-                "api_key": self._api_key,
+                "api_key": self.api_key,
                 "max_retries": 3,
                 "timeout": 30.0,
             }
-            if self._base_url:
-                kwargs["base_url"] = self._base_url
+            if self.base_url:
+                kwargs["base_url"] = self.base_url
             self._client = Anthropic(**kwargs)
         return self._client
 

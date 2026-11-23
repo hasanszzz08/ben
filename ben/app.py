@@ -95,12 +95,20 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/", include_in_schema=False)
+@app.get("/index.html", include_in_schema=False)
+@app.get("/api", include_in_schema=False)
+@app.get("/api/", include_in_schema=False)
+@app.get("/api/index.py", include_in_schema=False)
 async def serve_ui():
     """Serve the BEN chat interface."""
     index = STATIC_DIR / "index.html"
     if not index.exists():
-        return {"error": "UI not found."}
-    return FileResponse(str(index))
+        alt = Path(__file__).resolve().parent.parent / "public" / "index.html"
+        if alt.exists():
+            index = alt
+    if not index.exists():
+        return HTMLResponse("<h2>BEN AI UI not found.</h2>", status_code=404)
+    return HTMLResponse(content=index.read_text(encoding="utf-8"))
 
 
 @app.get("/dashboard", include_in_schema=False)

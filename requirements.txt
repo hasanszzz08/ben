@@ -1,0 +1,25 @@
+# BEN - Personal AI Agent Dependencies
+
+# Anthropic Claude API
+anthropic>=0.40.0
+
+# Environment and Configuration
+python-dotenv>=1.0.1
+pydantic>=2.10.0
+pydantic-settings>=2.7.0
+
+# Web Backend & Chat API
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+
+# CLI and Logging
+rich>=13.9.0
+
+# Windows Desktop Companion
+PySide6>=6.8.0
+
+# Testing
+pytest>=8.3.0
+httpx>=0.28.0
+pytest-asyncio>=0.24.0

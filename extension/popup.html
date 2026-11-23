@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BEN — Personal AI Agent</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- ─── Header ─── -->
+  <header class="header">
+    <div class="header-left">
+      <div class="ben-logo">B</div>
+      <div class="header-info">
+        <span class="header-title">BEN</span>
+        <span class="status-dot" id="statusDot" title="Checking…"></span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="btnNewChat" title="New conversation">&#x2715;</button>
+    </div>
+  </header>
+
+  <!-- ─── Tab Bar ─── -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="chat">💬 Chat</button>
+    <button class="tab-btn" data-tab="tools">⚡ Tools</button>
+  </nav>
+
+  <!-- ════════════════════════════════════════════
+       TAB: CHAT
+  ════════════════════════════════════════════ -->
+  <section class="tab-panel active" id="tab-chat">
+    <!-- Messages -->
+    <div class="messages" id="messages">
+      <div class="welcome-msg">
+        <p>Hello! I'm <strong>BEN</strong>, your personal AI agent.</p>
+        <p>Ask me anything, or use the <strong>Tools</strong> tab to summarize the current page, explain selected text, or save notes.</p>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <textarea
+        id="chatInput"
+        class="chat-input"
+        rows="1"
+        placeholder="Message BEN… (Enter to send, Shift+Enter for new line)"
+        maxlength="4000"
+      ></textarea>
+      <div class="input-buttons">
+        <button class="send-btn" id="btnSend" title="Send">&#x27A4;</button>
+        <button class="stop-btn hidden" id="btnStop" title="Stop generation">&#x25A0;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       TAB: TOOLS
+  ════════════════════════════════════════════ -->
+  <section class="tab-panel" id="tab-tools">
+    <!-- Summarize current page -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <span class="tool-icon">📄</span>
+        <div>
+          <div class="tool-title">Summarize Page</div>
+          <div class="tool-desc">Extract and summarize the current tab's content</div>
+        </div>
+      </div>
+      <button class="tool-btn" id="btnSummarize">Summarize Current Page</button>
+    </div>
+
+    <!-- Explain selection -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <span class="tool-icon">🔍</span>
+        <div>
+          <div class="tool-title">Explain Selection</div>
+          <div class="tool-desc">Explain highlighted text on the active tab</div>
+        </div>
+      </div>
+      <button class="tool-btn" id="btnExplain">Explain Selected Text</button>
+    </div>
+
+    <!-- Save to memory -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <span class="tool-icon">🧠</span>
+        <div>
+          <div class="tool-title">Save to Memory</div>
+          <div class="tool-desc">Save highlighted text to BEN's long-term memory</div>
+        </div>
+      </div>
+      <div class="save-controls">
+        <select class="category-select" id="categorySelect">
+          <option value="note">📝 Note</option>
+          <option value="goal">🎯 Goal</option>
+          <option value="project">🚀 Project</option>
+          <option value="preference">⭐ Preference</option>
+          <option value="context">🗂️ Context</option>
+        </select>
+        <button class="tool-btn" id="btnSave">Save Selection</button>
+      </div>
+    </div>
+
+    <!-- Tool result display -->
+    <div class="tool-result hidden" id="toolResult">
+      <div class="tool-result-header">
+        <span id="toolResultLabel">Result</span>
+        <button class="copy-btn" id="btnCopyResult" title="Copy to clipboard">⧉ Copy</button>
+      </div>
+      <div class="tool-result-body" id="toolResultBody"></div>
+    </div>
+  </section>
+
+  <!-- ─── Status bar ─── -->
+  <footer class="status-bar">
+    <span id="statusText">Connecting to BEN…</span>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

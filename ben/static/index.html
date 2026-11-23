@@ -1,0 +1,2380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BEN — Autonomous AI Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════
+       BEN AI — VORTASKY DESIGN SYSTEM
+       Aesthetic: Deep Midnight Obsidian, Cosmic Purple, Golden Energy HUD
+       ═══════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-base:        #080410;
+      --bg-gradient:    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 40, 200, 0.25), transparent 70%),
+                        radial-gradient(circle 600px at 85% 20%, rgba(79, 70, 229, 0.15), transparent),
+                        radial-gradient(circle 500px at 15% 80%, rgba(217, 119, 6, 0.12), transparent),
+                        #080410;
+      --panel-bg:       rgba(18, 12, 34, 0.62);
+      --panel-border:   rgba(168, 85, 247, 0.2);
+      --panel-border-hover: rgba(192, 132, 252, 0.45);
+      --card-bg:        rgba(26, 17, 50, 0.52);
+      --card-border:    rgba(147, 51, 234, 0.22);
+      --input-bg:       rgba(14, 9, 28, 0.72);
+
+      --accent-purple:  #a855f7;
+      --accent-indigo:  #6366f1;
+      --accent-glow:    rgba(168, 85, 247, 0.35);
+      --accent-amber:   #f59e0b;
+      --accent-gold:    #fbbf24;
+      --gold-glow:      rgba(245, 158, 11, 0.45);
+      --accent-cyan:    #06b6d4;
+      --cyan-glow:      rgba(6, 182, 212, 0.4);
+
+      --text-main:      #f3f4f6;
+      --text-muted:     #9ca3af;
+      --text-dim:       #6b7280;
+      --text-accent:    #c084fc;
+
+      --bubble-user:    linear-gradient(135deg, rgba(88, 28, 135, 0.62) 0%, rgba(126, 34, 206, 0.52) 100%);
+      --bubble-ben:     rgba(22, 14, 42, 0.72);
+      --bubble-border:  rgba(168, 85, 247, 0.22);
+
+      --glass-specular: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+      --success:        #10b981;
+      --error:          #f43f5e;
+      --font-sans:      'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono:      'JetBrains Mono', 'Consolas', monospace;
+      --radius-lg:      16px;
+      --radius-md:      12px;
+      --radius-sm:      8px;
+      --radius-pill:    9999px;
+      --transition:     all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ambient Haze */
+    .ambient-glow {
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, rgba(99, 102, 241, 0.1) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(60px);
+    }
+
+    /* Subtle custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(168, 85, 247, 0.25);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(168, 85, 247, 0.5);
+    }
+
+    /* ── Header (Vortasky Style) ────────────────────────────────── */
+    #header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 28px;
+      background: rgba(12, 7, 24, 0.68);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--panel-border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), var(--glass-specular);
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px var(--accent-glow);
+      position: relative;
+      overflow: hidden;
+    }
+    .brand-icon::after {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      border-radius: calc(var(--radius-md) - 1px);
+      background: #0f0820;
+    }
+    .brand-icon span {
+      position: relative;
+      z-index: 2;
+      font-weight: 800;
+      font-size: 16px;
+      background: linear-gradient(135deg, #f3f4f6, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-text h1 span {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #d8b4fe;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Nav View Switcher Pills */
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(22, 13, 44, 0.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--glass-specular);
+      padding: 4px;
+      border-radius: var(--radius-pill);
+    }
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .nav-tab:hover {
+      color: var(--text-main);
+    }
+    .nav-tab.active {
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.7) 0%, rgba(99, 102, 241, 0.7) 100%);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(147, 51, 234, 0.4);
+    }
+
+    /* Header Controls */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(26, 17, 50, 0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--glass-specular);
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #6b7280;
+      transition: var(--transition);
+    }
+    .status-dot.online {
+      background: var(--success);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+    }
+    .status-dot.speaking {
+      background: var(--accent-amber);
+      box-shadow: 0 0 10px var(--gold-glow);
+      animation: pulse 1s infinite;
+    }
+
+    .btn-action {
+      background: rgba(26, 17, 50, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--glass-specular);
+      color: var(--text-main);
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+    .btn-action:hover {
+      background: rgba(147, 51, 234, 0.25);
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    .btn-action.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--accent-amber);
+      color: var(--accent-gold);
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    /* ── Main View Container ────────────────────────────────────── */
+    #app-container {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: calc(100vh - 61px);
+      display: flex;
+    }
+
+    .view-panel {
+      display: none;
+      width: 100%;
+      min-height: calc(100vh - 61px);
+      flex-direction: column;
+    }
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       VIEW 1: CHAT INTERFACE (VORTASKY CLEAN DARK STYLE)
+       ═══════════════════════════════════════════════════════════════════ */
+    #view-chat {
+      max-width: 980px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 61px);
+      min-height: 520px;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth;
+    }
+    #messages::-webkit-scrollbar { width: 5px; }
+    #messages::-webkit-scrollbar-thumb {
+      background: rgba(147, 51, 234, 0.25);
+      border-radius: 4px;
+    }
+
+    /* Hero Welcome in Chat */
+    .hero-banner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      padding: 30px 20px;
+      background: linear-gradient(180deg, rgba(30, 18, 60, 0.55) 0%, rgba(15, 9, 30, 0.4) 100%);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), var(--glass-specular);
+      margin: 10px 0 20px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #d8b4fe;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.2);
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 30%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      max-width: 620px;
+      line-height: 1.25;
+    }
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .hero-chip {
+      background: rgba(30, 20, 58, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--glass-specular);
+      color: #e2e8f0;
+      padding: 7px 15px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+    .hero-chip:hover {
+      background: rgba(147, 51, 234, 0.3);
+      border-color: var(--accent-purple);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(147, 51, 234, 0.3);
+    }
+
+    /* Message Bubbles */
+    .message-row {
+      display: flex;
+      gap: 14px;
+      max-width: 100%;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .message-row.user {
+      flex-direction: row-reverse;
+    }
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      flex-shrink: 0;
+      box-shadow: 0 0 14px rgba(0,0,0,0.4);
+    }
+    .message-row.user .message-avatar {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+    }
+    .message-row.ben .message-avatar {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      box-shadow: 0 0 16px var(--gold-glow);
+    }
+
+    .bubble-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: calc(100% - 60px);
+    }
+    .bubble-header {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 0 4px;
+    }
+    .message-row.user .bubble-header { text-align: right; }
+
+    .bubble-body {
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      line-height: 1.65;
+      word-break: break-word;
+      white-space: pre-wrap;
+      position: relative;
+    }
+    .message-row.user .bubble-body {
+      background: var(--bubble-user);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-top-right-radius: 4px;
+      color: #faf5ff;
+      box-shadow: 0 4px 16px rgba(126, 34, 206, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .message-row.ben .bubble-body {
+      background: var(--bubble-ben);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--bubble-border);
+      border-top-left-radius: 4px;
+      color: #f3f4f6;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), var(--glass-specular);
+    }
+    .bubble-body.error {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: #fecdd3;
+    }
+
+    /* Speak Message Button inside AI Bubble */
+    .bubble-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .btn-bubble-tool {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+    .btn-bubble-tool:hover {
+      color: var(--accent-gold);
+      background: rgba(245, 158, 11, 0.12);
+    }
+
+    /* Code Blocks */
+    .bubble-body code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      background: rgba(10, 5, 20, 0.7);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: #e9d5ff;
+    }
+    .bubble-body pre {
+      background: #080412;
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+    .bubble-body pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: #c084fc;
+    }
+
+    /* Stream cursor */
+    .stream-cursor {
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      background: var(--accent-amber);
+      margin-left: 3px;
+      vertical-align: middle;
+      animation: blink 0.7s infinite;
+      box-shadow: 0 0 8px var(--gold-glow);
+    }
+
+    /* Chat Input Bar */
+    .chat-input-bar {
+      margin-top: auto;
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 10px 14px;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), var(--glass-specular);
+      transition: var(--transition);
+    }
+    .chat-input-bar:focus-within {
+      border-color: var(--accent-purple);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 3px rgba(168, 85, 247, 0.25);
+    }
+
+    #chat-textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: none;
+      min-height: 24px;
+      max-height: 140px;
+    }
+    #chat-textarea::placeholder { color: var(--text-dim); }
+
+    .input-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mic-btn-input {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-pill);
+      background: rgba(30, 20, 58, 0.8);
+      border: 1px solid var(--panel-border);
+      color: var(--accent-gold);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    .mic-btn-input:hover {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--accent-amber);
+      transform: scale(1.05);
+    }
+    .mic-btn-input.listening {
+      background: var(--accent-amber);
+      color: #000;
+      box-shadow: 0 0 20px var(--gold-glow);
+      animation: pulse 1.2s infinite;
+    }
+
+    .send-btn-input {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, #9333ea, #6366f1);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      box-shadow: 0 0 14px rgba(147, 51, 234, 0.4);
+    }
+    .send-btn-input:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(147, 51, 234, 0.6);
+    }
+    .send-btn-input:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .stop-btn-input {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-pill);
+      background: rgba(244, 63, 94, 0.2);
+      border: 1px solid var(--error);
+      color: var(--error);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .stop-btn-input.visible { display: flex; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       VIEW 2: BEN HOLOGRAPHIC VOICE CORE (VOICE ASSISTANT HUD)
+       ═══════════════════════════════════════════════════════════════════ */
+    #view-jarvis {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: calc(100vh - 61px);
+      padding: 30px 20px;
+      text-align: center;
+      overflow-y: auto;
+    }
+    #view-jarvis.active {
+      display: flex;
+    }
+
+    /* Holographic Background Grid & Radial Glow */
+    .jarvis-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at center, transparent 40%, rgba(8, 4, 16, 0.95) 85%),
+        linear-gradient(to right, rgba(245, 158, 11, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(245, 158, 11, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+      pointer-events: none;
+    }
+
+    /* Canvas Arc Reactor */
+    .canvas-wrapper {
+      position: relative;
+      width: 360px;
+      height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .canvas-wrapper:hover {
+      transform: scale(1.02);
+    }
+    #jarvis-canvas {
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+    }
+
+    /* Floating HUD telemetry around the core */
+    .hud-tag {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-amber);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      background: rgba(18, 12, 34, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), var(--glass-specular);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    .hud-tag.top-left { top: 20px; left: -20px; }
+    .hud-tag.top-right { top: 20px; right: -20px; }
+    .hud-tag.bot-left { bottom: 20px; left: -20px; }
+    .hud-tag.bot-right { bottom: 20px; right: -20px; }
+
+    /* Voice Center Status & Audio Meter */
+    .jarvis-status-box {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      z-index: 2;
+    }
+    .jarvis-state-label {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .jarvis-state-label .glow-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-amber);
+      box-shadow: 0 0 16px var(--gold-glow);
+    }
+
+    /* Live Speech Transcription Pill */
+    .jarvis-transcript-box {
+      min-height: 48px;
+      max-width: 600px;
+      padding: 12px 24px;
+      background: rgba(22, 14, 42, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: var(--radius-pill);
+      color: #fde68a;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), var(--glass-specular);
+      transition: var(--transition);
+    }
+
+    /* Audio wave visualizer bar */
+    .audio-wave-bars {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 24px;
+    }
+    .wave-bar {
+      width: 3px;
+      height: 4px;
+      background: var(--accent-amber);
+      border-radius: 2px;
+      transition: height 0.08s ease;
+    }
+
+    /* Voice Controls */
+    .jarvis-voice-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .btn-voice-trigger {
+      padding: 12px 28px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border: none;
+      color: #000;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 25px var(--gold-glow);
+      transition: var(--transition);
+    }
+    .btn-voice-trigger:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 35px var(--gold-glow);
+    }
+    .btn-voice-trigger.listening {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+      animation: pulse 1s infinite;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       VIEW 3: WORKFLOWS & AUTOMATION (IMAGE 1 VORTASKY KANBAN BOARD)
+       ═══════════════════════════════════════════════════════════════════ */
+    #view-workflows {
+      padding: 24px 32px;
+      display: none;
+      flex-direction: column;
+      min-height: calc(100vh - 61px);
+      overflow-y: auto;
+    }
+    #view-workflows.active {
+      display: flex;
+    }
+
+    .workflow-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    .workflow-header h2 {
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .workflow-header p {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Connected Apps Nodes Visualizer (from Image 1) */
+    .integrations-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 18px;
+      background: rgba(22, 14, 42, 0.58);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glass-specular);
+      margin-bottom: 20px;
+    }
+    .integration-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #c084fc;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .integration-icons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .app-node {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(30, 20, 58, 0.7);
+      border: 1px solid var(--card-border);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .app-node.active {
+      border-color: #10b981;
+      color: #a7f3d0;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Kanban Columns (To-Do, In Progress, Complete) */
+    .kanban-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      flex: 1;
+    }
+    .kanban-col {
+      background: rgba(18, 12, 34, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), var(--glass-specular);
+    }
+    .kanban-col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .kanban-col-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .col-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: rgba(168, 85, 247, 0.2);
+      color: #d8b4fe;
+    }
+
+    .kanban-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      max-height: 480px;
+    }
+
+    .kanban-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), var(--glass-specular);
+    }
+    .kanban-card:hover {
+      border-color: var(--accent-purple);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(147, 51, 234, 0.25);
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 6px;
+    }
+    .card-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+    .card-tag.tester { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+    .card-tag.product { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* ── Slide-Out Memory Drawer ─────────────────────────────────── */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 99;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .memory-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 480px;
+      max-width: 92vw;
+      background: rgba(13, 8, 28, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-left: 1px solid var(--panel-border);
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8), inset 1px 0 0 rgba(255, 255, 255, 0.05);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .memory-drawer.open { transform: translateX(0); }
+
+    .drawer-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(18, 11, 36, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .drawer-title-wrap h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .drawer-title-wrap p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .drawer-tabs {
+      display: flex;
+      background: rgba(13, 8, 28, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--panel-border);
+    }
+    .drawer-tab {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+    }
+    .drawer-tab:hover { color: #fff; }
+    .drawer-tab.active {
+      color: var(--accent-purple);
+      border-bottom-color: var(--accent-purple);
+      background: rgba(168, 85, 247, 0.08);
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .drawer-tab-pane { display: none; }
+    .drawer-tab-pane.active { display: flex; flex-direction: column; gap: 14px; }
+
+    /* Memory Item Card */
+    .memory-item {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--glass-specular);
+      transition: var(--transition);
+    }
+    .memory-item:hover { border-color: var(--accent-purple); }
+    .memory-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .category-pill {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .category-pill.goal       { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .category-pill.preference { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+    .category-pill.project    { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+    .category-pill.context    { background: rgba(6, 182, 212, 0.2); color: #67e8f9; }
+    .category-pill.note       { background: rgba(52, 211, 153, 0.2); color: #6ee7b7; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 10px 18px;
+      background: rgba(26, 17, 50, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), var(--glass-specular);
+      transform: translateY(60px);
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+      z-index: 999;
+    }
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #toast.success { border-color: var(--success); }
+    #toast.error { border-color: var(--error); color: #fecdd3; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.08); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      #header { padding: 10px 16px; }
+      #view-chat { padding: 12px 14px 16px; }
+      .kanban-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 22px; }
+      .canvas-wrapper { width: 300px; height: 300px; }
+      #jarvis-canvas { width: 300px; height: 300px; }
+    }
+    @media (max-height: 640px) {
+      #view-chat { height: auto; min-height: calc(100vh - 61px); }
+      #messages { overflow-y: visible; }
+      .chat-input-bar { position: sticky; bottom: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <!-- ── Top Header (Vortasky Style) ────────────────────────── -->
+  <header id="header">
+    <div class="brand" id="brand-home">
+      <div class="brand-icon">
+        <span>B</span>
+      </div>
+      <div class="brand-text">
+        <h1>BEN AI <span>Voice Core</span></h1>
+      </div>
+    </div>
+
+    <!-- Central View Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-view="chat">
+        <span>💬</span> Chat
+      </button>
+      <button class="nav-tab" data-view="jarvis">
+        <span>⚡</span> Voice Core
+      </button>
+      <button class="nav-tab" data-view="workflows">
+        <span>⚡</span> Workflows & Tasks
+      </button>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <!-- Voice Audio Toggle -->
+      <button class="btn-action" id="tts-toggle-btn" title="Toggle Voice Output">
+        <span id="tts-icon">🔊</span>
+        <span id="tts-label">Voice On</span>
+      </button>
+
+      <!-- Status Indicator -->
+      <div class="pill-badge" id="status-badge">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Online</span>
+      </div>
+
+      <!-- Memory Drawer Toggle -->
+      <button class="btn-action" id="memory-btn" title="Inspect & Edit Long-Term Memory">
+        <span>🧠</span> Memory
+      </button>
+
+      <!-- New Chat Button -->
+      <button class="btn-action" id="new-chat-btn" title="Start Fresh Conversation">
+        <span>+</span> New
+      </button>
+    </div>
+  </header>
+
+  <!-- ── App View Container ─────────────────────────────────── -->
+  <main id="app-container">
+
+    <!-- ════════════════════════════════════════════════════════
+         VIEW 1: CHAT INTERFACE
+    ════════════════════════════════════════════════════════ -->
+    <section class="view-panel active" id="view-chat">
+      <div id="messages">
+        <!-- Hero Welcome (Vortasky AI Style) -->
+        <div class="hero-banner" id="hero-welcome">
+          <div class="hero-tag">✨ Autonomous Intelligence Core · Active</div>
+          <h2 class="hero-title">Simplify Your Workflow with BEN AI</h2>
+          <p class="hero-desc">
+            Your personal autonomous assistant combines Claude intelligence, Windows computer tools, persistent memory, and browser automation.
+          </p>
+          <div class="hero-chips">
+            <button class="hero-chip" data-prompt="What are my current goals and active projects?">
+              🎯 Show My Goals
+            </button>
+            <button class="hero-chip" data-prompt="Activate voice assistant mode and give me a morning briefing.">
+              🎙️ Voice Briefing
+            </button>
+            <button class="hero-chip" data-prompt="Help me organize my workflow tasks for this week.">
+              ⚡ Workflow Planning
+            </button>
+            <button class="hero-chip" data-prompt="Review my open projects and suggest next milestones.">
+              🚀 Project Review
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input Bar -->
+      <div class="chat-input-bar">
+        <textarea
+          id="chat-textarea"
+          placeholder="Ask BEN anything or click the microphone to speak… (Enter to send)"
+          rows="1"
+          maxlength="32000"
+        ></textarea>
+        <div class="input-btns">
+          <!-- Voice Dictation Button -->
+          <button class="mic-btn-input" id="mic-btn-chat" title="Push to talk (Speech Recognition)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+          </button>
+
+          <!-- Stop Button -->
+          <button class="stop-btn-input" id="stop-btn" title="Stop Generation">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+              <rect x="2" y="2" width="10" height="10" rx="2"/>
+            </svg>
+          </button>
+
+          <!-- Send Button -->
+          <button class="send-btn-input" id="send-btn" title="Send (Enter)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════
+         VIEW 2: BEN HOLOGRAPHIC VOICE CORE (VOICE ASSISTANT HUD)
+    ════════════════════════════════════════════════════════ -->
+    <section class="view-panel" id="view-jarvis">
+      <div class="jarvis-grid-bg"></div>
+
+      <!-- Holographic Voice Core Canvas -->
+      <div class="canvas-wrapper" id="canvas-reactor-wrap" title="Click to Speak / Listen">
+        <canvas id="jarvis-canvas" width="400" height="400"></canvas>
+        <span class="hud-tag top-left">BEN VOICE CORE // ONLINE</span>
+        <span class="hud-tag top-right">CLAUDE 3.5 SONNET</span>
+        <span class="hud-tag bot-left">SYS AUDIO: SYNCED</span>
+        <span class="hud-tag bot-right">CORE TELEMETRY: 99.8%</span>
+      </div>
+
+      <!-- BEN Telemetry Status -->
+      <div class="jarvis-status-box">
+        <div class="jarvis-state-label" id="jarvis-state-text">
+          <span class="glow-dot"></span> BEN CORE // STANDBY
+        </div>
+
+        <!-- Live Audio Wave Oscilloscope -->
+        <div class="audio-wave-bars" id="audio-wave-bars">
+          <!-- 24 wave bars populated by JS -->
+        </div>
+
+        <!-- Live Speech Transcription Bubble -->
+        <div class="jarvis-transcript-box" id="jarvis-transcript">
+          "Click the Voice Core or press Push-to-Talk to speak with BEN."
+        </div>
+
+        <!-- Voice Action Buttons -->
+        <div class="jarvis-voice-controls">
+          <button class="btn-voice-trigger" id="jarvis-mic-trigger">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+            <span id="jarvis-mic-label">INITIALIZE VOICE</span>
+          </button>
+
+          <button class="btn-action" id="theme-color-toggle" title="Toggle Amber Gold / Cyan Pulse Core">
+            <span>⚡</span> Switch Core Energy
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════
+         VIEW 3: WORKFLOWS & TASKS (VORTASKY KANBAN)
+    ════════════════════════════════════════════════════════ -->
+    <section class="view-panel" id="view-workflows">
+      <div class="workflow-header">
+        <div>
+          <h2>Manage Tasks Effortlessly with BEN AI</h2>
+          <p>Organize projects, automated goals, and multi-turn milestones across your local computer and tools.</p>
+        </div>
+        <button class="btn-action active" id="btn-add-task">+ Create New Task</button>
+      </div>
+
+      <!-- Connected App Ecosystem Nodes (from Image 1) -->
+      <div class="integrations-bar">
+        <span class="integration-label">Omni-Channel Connectors:</span>
+        <div class="integration-icons">
+          <span class="app-node active">🌐 Chrome Extension</span>
+          <span class="app-node active">💻 Windows OS</span>
+          <span class="app-node active">🧠 SQLite Memory</span>
+          <span class="app-node active">⚡ FastAPI Engine</span>
+          <span class="app-node active">⚡ Claude 3.5 Sonnet</span>
+        </div>
+      </div>
+
+      <!-- Kanban Columns -->
+      <div class="kanban-grid">
+        <!-- Col 1: To-Do -->
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title">📌 To-Do</span>
+            <span class="col-badge" id="badge-todo">2</span>
+          </div>
+          <div class="kanban-cards" id="cards-todo">
+            <div class="kanban-card">
+              <div class="card-tags">
+                <span class="card-tag tester">Tester</span>
+                <span class="card-tag product">Product</span>
+              </div>
+              <div class="card-title">Setup Local Computer Tools (Phase 6)</div>
+              <div class="card-meta">
+                <span>Security Sandbox</span>
+                <span>Priority: High</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="card-tags">
+                <span class="card-tag product">AI Agent</span>
+              </div>
+              <div class="card-title">Autonomous Study & Productivity Schedule</div>
+              <div class="card-meta">
+                <span>Memory Context</span>
+                <span>Auto-sync</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 2: In Progress -->
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title">⚡ In Progress</span>
+            <span class="col-badge" id="badge-progress">2</span>
+          </div>
+          <div class="kanban-cards" id="cards-progress">
+            <div class="kanban-card">
+              <div class="card-tags">
+                <span class="card-tag tester">UI/UX</span>
+                <span class="card-tag product">Frontend</span>
+              </div>
+              <div class="card-title">BEN Voice Assistant & Audio HUD</div>
+              <div class="card-meta">
+                <span>Audio Synthesis</span>
+                <span>Active</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="card-tags">
+                <span class="card-tag tester">System</span>
+              </div>
+              <div class="card-title">PySide6 Desktop Companion Bridge</div>
+              <div class="card-meta">
+                <span>Hotkeys & Tray</span>
+                <span>Running</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 3: Complete -->
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title">✅ Complete</span>
+            <span class="col-badge" id="badge-complete">3</span>
+          </div>
+          <div class="kanban-cards" id="cards-complete">
+            <div class="kanban-card">
+              <div class="card-tags">
+                <span class="card-tag product">Core</span>
+              </div>
+              <div class="card-title">Anthropic Claude & API Integration</div>
+              <div class="card-meta">
+                <span>claude-3-5-sonnet</span>
+                <span>Verified</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="card-tags">
+                <span class="card-tag tester">Memory</span>
+              </div>
+              <div class="card-title">Persistent SQLite Core Memories (Phase 3)</div>
+              <div class="card-meta">
+                <span>Thread-safe</span>
+                <span>Verified</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="card-tags">
+                <span class="card-tag product">Extension</span>
+              </div>
+              <div class="card-title">Chrome Extension Manifest V3 (Phase 5)</div>
+              <div class="card-meta">
+                <span>36 Tests Passing</span>
+                <span>Loaded</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Slide-Out Memory Drawer (Phase 3 & 4) ──────────────── -->
+  <div id="drawer-backdrop" class="drawer-backdrop"></div>
+  <aside id="memory-drawer" class="memory-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-wrap">
+        <h2>🧠 Memory & Sessions</h2>
+        <p>Persistent SQLite storage loaded into BEN's system reasoning</p>
+      </div>
+      <button class="btn-action" id="close-drawer-btn">✕</button>
+    </div>
+
+    <div class="drawer-tabs">
+      <button class="drawer-tab active" data-tab="memories-pane">Core Memories</button>
+      <button class="drawer-tab" data-tab="sessions-pane">Saved Sessions</button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- Pane 1: Core Memories -->
+      <div id="memories-pane" class="drawer-tab-pane active">
+        <!-- Add Memory Form -->
+        <div class="memory-item" style="gap:10px;">
+          <span style="font-size:12px;font-weight:700;color:var(--accent-purple);">+ Add New Memory</span>
+          <div style="display:flex;gap:8px;">
+            <select id="new-memory-cat" style="background:#0a0514;color:#fff;border:1px solid var(--panel-border);padding:6px;border-radius:6px;font-size:12px;">
+              <option value="goal">🎯 Goal</option>
+              <option value="preference">⚙️ Preference</option>
+              <option value="project">🚀 Project</option>
+              <option value="context">📌 Context</option>
+              <option value="note">📝 Note</option>
+            </select>
+            <button id="save-memory-btn" class="btn-action" style="background:var(--accent-purple);color:#fff;">Save</button>
+          </div>
+          <textarea id="new-memory-text" rows="2" placeholder="e.g. Remember my key goals and project milestones..." style="background:#0a0514;color:#fff;border:1px solid var(--panel-border);padding:8px;border-radius:6px;font-size:13px;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Memories List -->
+        <div id="memories-container" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <!-- Pane 2: Saved Sessions -->
+      <div id="sessions-pane" class="drawer-tab-pane">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--text-muted);">Session History</span>
+          <button id="refresh-sessions-btn" class="btn-action" style="padding:4px 10px;font-size:11px;">↻ Refresh</button>
+        </div>
+        <div id="sessions-container" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       BEN CLIENT CORE LOGIC
+       ═══════════════════════════════════════════════════════════════════ -->
+  <script>
+    'use strict';
+
+    // ── API Endpoints ───────────────────────────────────────────────
+    const API = {
+      STATUS:        '/api/chat/status',
+      STREAM:        '/api/chat/stream',
+      CLEAR:         '/api/chat/clear',
+      STOP:          '/api/chat/stop',
+      SWITCH:        (id) => `/api/chat/switch/${id}`,
+      MEMORIES:      '/api/memory/',
+      MEMORY:        (id) => `/api/memory/${id}`,
+      MEMORY_TOGGLE: (id) => `/api/memory/${id}/toggle`,
+      CONVERSATIONS: '/api/memory/conversations/',
+      CONVERSATION:  (id) => `/api/memory/conversations/${id}`,
+    };
+
+    // ── Global State ────────────────────────────────────────────────
+    let isGenerating = false;
+    let currentAbort = null;
+    let sessionId = null;
+    let allMemories = [];
+    let isListening = false;
+    let ttsEnabled = true;
+    let jarvisTheme = 'gold'; // 'gold' or 'cyan'
+
+    // ── Audio Context & Sound FX Generator (Web Audio API) ──────────
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // High-Tech Sound Effects
+    function playJarvisChime(type = 'wake') {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+
+        if (type === 'wake') {
+          // Ascending dual high-tech beep
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc1.type = 'sine';
+          osc2.type = 'triangle';
+          osc1.frequency.setValueAtTime(520, now);
+          osc1.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+
+          osc2.frequency.setValueAtTime(1040, now + 0.05);
+          osc2.frequency.exponentialRampToValueAtTime(1760, now + 0.2);
+
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc1.start(now);
+          osc2.start(now + 0.05);
+          osc1.stop(now + 0.28);
+          osc2.stop(now + 0.28);
+
+        } else if (type === 'done') {
+          // Pleasant resolution chord
+          [660, 880, 1320].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+            gain.gain.setValueAtTime(0.08, now + idx * 0.04);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.04);
+            osc.stop(now + 0.35);
+          });
+        }
+      } catch (err) {
+        console.warn('Audio FX error:', err);
+      }
+    }
+
+    // ── Speech Synthesis (BEN Voice TTS) ────────────────────────────
+    let selectedVoice = null;
+
+    function populateVoices() {
+      const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+      // Prefer natural English assistant voice for BEN
+      selectedVoice = voices.find(v => v.lang.includes('en-GB') || v.name.includes('British') || v.name.includes('George') || v.name.includes('Daniel'))
+        || voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Guy')))
+        || voices.find(v => v.lang.startsWith('en'))
+        || voices[0];
+    }
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = populateVoices;
+      populateVoices();
+    }
+
+    function speakJarvis(text) {
+      if (!ttsEnabled || !window.speechSynthesis) return;
+
+      window.speechSynthesis.cancel(); // Stop any pending speech
+      // Clean markdown code blocks from speech
+      const cleanText = text
+        .replace(/```[\s\S]*?```/g, 'Code block omitted.')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/[*_#>-]/g, ' ')
+        .trim();
+
+      if (!cleanText) return;
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.rate = 1.05; // Crisp intellectual tone
+      utterance.pitch = 0.95; // Calm, clear assistant tone
+
+      utterance.onstart = () => {
+        document.getElementById('status-dot').className = 'status-dot speaking';
+        document.getElementById('status-text').textContent = 'Speaking…';
+        setJarvisState('SPEAKING');
+      };
+      utterance.onend = () => {
+        document.getElementById('status-dot').className = 'status-dot online';
+        document.getElementById('status-text').textContent = 'Online';
+        setJarvisState('STANDBY');
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // ── Speech Recognition (STT Voice Input) ────────────────────────
+    let recognition = null;
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRec) {
+      recognition = new SpeechRec();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isListening = true;
+        playJarvisChime('wake');
+        document.getElementById('mic-btn-chat').classList.add('listening');
+        document.getElementById('jarvis-mic-trigger').classList.add('listening');
+        document.getElementById('jarvis-mic-label').textContent = 'LISTENING…';
+        setJarvisState('LISTENING');
+        showToast('🎙️ BEN listening…', 'success');
+      };
+
+      recognition.onresult = (evt) => {
+        const transcript = Array.from(evt.results)
+          .map(r => r[0].transcript)
+          .join('');
+
+        document.getElementById('jarvis-transcript').textContent = `"${transcript}"`;
+        document.getElementById('chat-textarea').value = transcript;
+        resizeTextarea();
+        updateSendBtn();
+      };
+
+      recognition.onerror = (evt) => {
+        console.warn('Speech Recognition error:', evt.error);
+        stopListening();
+        showToast('Speech recognition error: ' + evt.error, 'error');
+      };
+
+      recognition.onend = () => {
+        stopListening();
+        const finalPrompt = document.getElementById('chat-textarea').value.trim();
+        if (finalPrompt) {
+          playJarvisChime('done');
+          sendMessage();
+        }
+      };
+    }
+
+    function toggleListening() {
+      if (!recognition) {
+        showToast('Speech recognition not supported in this browser.', 'error');
+        return;
+      }
+      if (isListening) {
+        recognition.stop();
+      } else {
+        getAudioContext();
+        try { recognition.start(); } catch {}
+      }
+    }
+
+    function stopListening() {
+      isListening = false;
+      document.getElementById('mic-btn-chat').classList.remove('listening');
+      document.getElementById('jarvis-mic-trigger').classList.remove('listening');
+      document.getElementById('jarvis-mic-label').textContent = 'INITIALIZE VOICE';
+      if (!isGenerating) setJarvisState('STANDBY');
+    }
+
+    // ── Holographic Arc-Reactor Sphere Canvas Animation ─────────────
+    const canvas = document.getElementById('jarvis-canvas');
+    const ctx = canvas.getContext('2d');
+    let animationFrameId = null;
+    let rotationAngle = 0;
+    let corePulse = 0;
+    let jarvisState = 'STANDBY'; // 'STANDBY', 'LISTENING', 'THINKING', 'SPEAKING'
+
+    // Particle field
+    const particles = Array.from({ length: 60 }, () => ({
+      x: (Math.random() - 0.5) * 200,
+      y: (Math.random() - 0.5) * 200,
+      z: (Math.random() - 0.5) * 200,
+      size: Math.random() * 2 + 1,
+      speed: Math.random() * 0.02 + 0.01,
+    }));
+
+    function setJarvisState(state) {
+      jarvisState = state;
+      const label = document.getElementById('jarvis-state-text');
+      if (label) {
+        label.innerHTML = `<span class="glow-dot"></span> BEN CORE // ${state}`;
+      }
+    }
+
+    function drawArcReactor() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      // Primary Energy Theme Color
+      const primaryColor = jarvisTheme === 'gold' ? '#f59e0b' : '#06b6d4';
+      const secondaryColor = jarvisTheme === 'gold' ? '#fbbf24' : '#38bdf8';
+      const glowColor = jarvisTheme === 'gold' ? 'rgba(245, 158, 11, 0.4)' : 'rgba(6, 182, 212, 0.4)';
+
+      // Speed boost when thinking or listening
+      const speedMult = jarvisState === 'THINKING' ? 3.5 : jarvisState === 'LISTENING' ? 2.0 : 1.0;
+      rotationAngle += 0.015 * speedMult;
+      corePulse += 0.04 * speedMult;
+
+      // ── Outer Glowing Halo ──
+      const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 170);
+      grad.addColorStop(0, glowColor);
+      grad.addColorStop(0.5, 'rgba(168, 85, 247, 0.1)');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 170, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ── Concentric Segmented Rings ──
+      // Ring 1 (Outer compass ticks)
+      ctx.strokeStyle = primaryColor;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 150, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Outer ticks
+      const ticks = 36;
+      for (let i = 0; i < ticks; i++) {
+        const a = (i / ticks) * Math.PI * 2 + rotationAngle * 0.5;
+        const r1 = 144;
+        const r2 = i % 3 === 0 ? 154 : 148;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+        ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+        ctx.stroke();
+      }
+
+      // Ring 2 (Segmented Gyro Ring)
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-rotationAngle * 0.8);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = secondaryColor;
+      for (let s = 0; s < 4; s++) {
+        ctx.beginPath();
+        ctx.arc(0, 0, 115, s * Math.PI / 2 + 0.15, (s + 1) * Math.PI / 2 - 0.15);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Ring 3 (Inner Teeth)
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rotationAngle * 1.2);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = primaryColor;
+      for (let t = 0; t < 12; t++) {
+        const a = (t / 12) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 80, a, a + 0.25);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // ── Orbiting Holographic Particles ──
+      particles.forEach(p => {
+        p.x = p.x * Math.cos(p.speed) - p.z * Math.sin(p.speed);
+        p.z = p.z * Math.cos(p.speed) + p.x * Math.sin(p.speed);
+        const scale = 250 / (250 + p.z);
+        const px = cx + p.x * scale;
+        const py = cy + p.y * scale;
+
+        ctx.fillStyle = secondaryColor;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size * scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // ── Center Arc-Reactor Core ──
+      const pulseRadius = 38 + Math.sin(corePulse) * (jarvisState === 'LISTENING' ? 8 : 4);
+      const coreGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, pulseRadius);
+      coreGrad.addColorStop(0, '#ffffff');
+      coreGrad.addColorStop(0.3, secondaryColor);
+      coreGrad.addColorStop(1, glowColor);
+
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, pulseRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Inner Core Ring
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+      ctx.stroke();
+
+      animationFrameId = requestAnimationFrame(drawArcReactor);
+    }
+    drawArcReactor();
+
+    // Generate Audio Wave Bars in BEN Voice HUD
+    const waveContainer = document.getElementById('audio-wave-bars');
+    for (let i = 0; i < 24; i++) {
+      const b = document.createElement('div');
+      b.className = 'wave-bar';
+      waveContainer.appendChild(b);
+    }
+
+    // Animate wave bars randomly when speaking or listening
+    setInterval(() => {
+      const bars = waveContainer.querySelectorAll('.wave-bar');
+      bars.forEach(bar => {
+        if (jarvisState === 'LISTENING' || jarvisState === 'SPEAKING') {
+          const h = Math.floor(Math.random() * 20) + 4;
+          bar.style.height = h + 'px';
+        } else {
+          bar.style.height = '4px';
+        }
+      });
+    }, 90);
+
+    // ── Navigation & View Switching ──────────────────────────────────
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+
+        tab.classList.add('active');
+        const viewId = `view-${tab.dataset.view}`;
+        const targetView = document.getElementById(viewId);
+        if (targetView) targetView.classList.add('active');
+      });
+    });
+
+    document.getElementById('brand-home').addEventListener('click', () => {
+      document.querySelector('[data-view="chat"]').click();
+    });
+
+    // ── Core Engine & Anthropic Status Check ─────────────────────────
+    async function checkStatus() {
+      try {
+        const res = await fetch(API.STATUS);
+        if (!res.ok) throw new Error('Offline');
+        const data = await res.json();
+        sessionId = data.session_id;
+
+        const dot = document.getElementById('status-dot');
+        const text = document.getElementById('status-text');
+        if (data.status === 'online') {
+          dot.className = 'status-dot online';
+          text.textContent = `Online (${data.model})`;
+        } else {
+          dot.className = 'status-dot';
+          text.textContent = 'Unconfigured';
+        }
+      } catch {
+        document.getElementById('status-dot').className = 'status-dot';
+        document.getElementById('status-text').textContent = 'Offline';
+      }
+    }
+
+    // ── Chat Input Helpers ──────────────────────────────────────────
+    const textarea = document.getElementById('chat-textarea');
+    const sendBtn = document.getElementById('send-btn');
+    const stopBtn = document.getElementById('stop-btn');
+
+    function resizeTextarea() {
+      textarea.style.height = '24px';
+      textarea.style.height = Math.min(textarea.scrollHeight, 140) + 'px';
+    }
+
+    function updateSendBtn() {
+      const val = textarea.value.trim();
+      sendBtn.disabled = !val || isGenerating;
+    }
+
+    textarea.addEventListener('input', () => {
+      resizeTextarea();
+      updateSendBtn();
+    });
+
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!sendBtn.disabled) sendMessage();
+      }
+    });
+
+    // ── Message Rendering & Markdown Parsing ────────────────────────
+    function renderMarkdown(text) {
+      let s = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      s = s.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => `<pre><code>${code.trimEnd()}</code></pre>`);
+      s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+      s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      return s;
+    }
+
+    function appendMessage(role, content, isError = false) {
+      const welcome = document.getElementById('hero-welcome');
+      if (welcome) welcome.style.display = 'none';
+
+      const row = document.createElement('div');
+      row.className = `message-row ${role}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'message-avatar';
+      avatar.textContent = role === 'user' ? 'U' : 'B';
+
+      const container = document.createElement('div');
+      container.className = 'bubble-container';
+
+      const header = document.createElement('div');
+      header.className = 'bubble-header';
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      header.textContent = role === 'user' ? `You · ${timeStr}` : `BEN · ${timeStr}`;
+
+      const body = document.createElement('div');
+      body.className = `bubble-body ${isError ? 'error' : ''}`;
+      body.innerHTML = role === 'ben' && !isError ? renderMarkdown(content) : content;
+
+      container.appendChild(header);
+      container.appendChild(body);
+
+      // Add read-aloud button for AI responses
+      if (role === 'ben' && !isError) {
+        const footer = document.createElement('div');
+        footer.className = 'bubble-footer';
+        footer.innerHTML = `
+          <button class="btn-bubble-tool" onclick="speakJarvis('${content.replace(/'/g, "\\'")}')" title="Read Aloud with BEN Voice">
+            🔊 Read Aloud
+          </button>
+        `;
+        container.appendChild(footer);
+      }
+
+      row.appendChild(avatar);
+      row.appendChild(container);
+
+      const msgs = document.getElementById('messages');
+      msgs.appendChild(row);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    // ── Streaming Message Generation ────────────────────────────────
+    async function sendMessage() {
+      const text = textarea.value.trim();
+      if (!text || isGenerating) return;
+
+      textarea.value = '';
+      resizeTextarea();
+      updateSendBtn();
+
+      appendMessage('user', text);
+      isGenerating = true;
+      sendBtn.disabled = true;
+      stopBtn.classList.add('visible');
+      setJarvisState('THINKING');
+
+      // Add streaming bubble placeholder
+      const welcome = document.getElementById('hero-welcome');
+      if (welcome) welcome.style.display = 'none';
+
+      const row = document.createElement('div');
+      row.className = 'message-row ben';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'message-avatar';
+      avatar.textContent = 'B';
+
+      const container = document.createElement('div');
+      container.className = 'bubble-container';
+
+      const header = document.createElement('div');
+      header.className = 'bubble-header';
+      header.textContent = `BEN · ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+      const body = document.createElement('div');
+      body.className = 'bubble-body';
+
+      const cursor = document.createElement('span');
+      cursor.className = 'stream-cursor';
+      body.appendChild(cursor);
+
+      container.appendChild(header);
+      container.appendChild(body);
+      row.appendChild(avatar);
+      row.appendChild(container);
+
+      const msgs = document.getElementById('messages');
+      msgs.appendChild(row);
+      msgs.scrollTop = msgs.scrollHeight;
+
+      currentAbort = new AbortController();
+      let accumulated = '';
+
+      try {
+        let resp;
+        try {
+          resp = await fetch(API.STREAM, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text }),
+            signal: currentAbort.signal,
+          });
+        } catch (fetchErr) {
+          if (fetchErr.name === 'AbortError') throw fetchErr;
+          await new Promise(r => setTimeout(r, 500));
+          resp = await fetch(API.STREAM, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text }),
+            signal: currentAbort.signal,
+          });
+        }
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({ detail: resp.statusText }));
+          throw new Error(errData.detail || `HTTP ${resp.status}`);
+        }
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const raw = line.slice(6).trim();
+            if (!raw) continue;
+
+            let evt;
+            try { evt = JSON.parse(raw); } catch { continue; }
+
+            if (evt.type === 'token') {
+              accumulated += evt.text;
+              body.innerHTML = renderMarkdown(accumulated);
+              body.appendChild(cursor);
+              msgs.scrollTop = msgs.scrollHeight;
+
+            } else if (evt.type === 'done') {
+              sessionId = evt.session_id;
+              if (cursor.parentNode) cursor.remove();
+              body.innerHTML = renderMarkdown(accumulated || '(No response)');
+              playJarvisChime('done');
+              speakJarvis(accumulated);
+              break;
+
+            } else if (evt.type === 'cancelled') {
+              if (cursor.parentNode) cursor.remove();
+              body.innerHTML = renderMarkdown(accumulated || '(Generation stopped)');
+              break;
+
+            } else if (evt.type === 'error') {
+              if (cursor.parentNode) cursor.remove();
+              body.className = 'bubble-body error';
+              body.textContent = `Error: ${evt.detail}`;
+              break;
+            }
+          }
+        }
+
+      } catch (err) {
+        if (cursor.parentNode) cursor.remove();
+        if (err.name !== 'AbortError') {
+          body.className = 'bubble-body error';
+          body.textContent = `Error: ${err.message}`;
+        }
+      } finally {
+        isGenerating = false;
+        sendBtn.disabled = false;
+        stopBtn.classList.remove('visible');
+        setJarvisState('STANDBY');
+      }
+    }
+
+    // ── Stop Generation ─────────────────────────────────────────────
+    stopBtn.addEventListener('click', async () => {
+      if (currentAbort) currentAbort.abort();
+      try { await fetch(API.STOP, { method: 'POST' }); } catch {}
+      isGenerating = false;
+      stopBtn.classList.remove('visible');
+      sendBtn.disabled = false;
+      setJarvisState('STANDBY');
+      showToast('Generation cancelled.', '');
+    });
+
+    // ── New Conversation ────────────────────────────────────────────
+    document.getElementById('new-chat-btn').addEventListener('click', async () => {
+      if (isGenerating) stopBtn.click();
+      try {
+        const res = await fetch(API.CLEAR, { method: 'POST' });
+        const data = await res.json();
+        sessionId = data.session_id;
+
+        document.getElementById('messages').innerHTML = `
+          <div class="hero-banner" id="hero-welcome">
+            <div class="hero-tag">✨ Autonomous Intelligence Core · Active</div>
+            <h2 class="hero-title">Simplify Your Workflow with BEN AI</h2>
+            <p class="hero-desc">Previous conversation archived to SQLite. BEN is ready for your next instruction.</p>
+          </div>
+        `;
+        showToast('New conversation initialized.', 'success');
+      } catch {
+        showToast('Could not clear conversation.', 'error');
+      }
+    });
+
+    // ── Voice & Audio Controls ──────────────────────────────────────
+    document.getElementById('tts-toggle-btn').addEventListener('click', () => {
+      ttsEnabled = !ttsEnabled;
+      const icon = document.getElementById('tts-icon');
+      const label = document.getElementById('tts-label');
+      if (ttsEnabled) {
+        icon.textContent = '🔊';
+        label.textContent = 'Voice On';
+        showToast('Voice synthesis enabled.', 'success');
+      } else {
+        icon.textContent = '🔇';
+        label.textContent = 'Voice Muted';
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        showToast('Voice output muted.', '');
+      }
+    });
+
+    // Mic Button in Chat Bar
+    document.getElementById('mic-btn-chat').addEventListener('click', toggleListening);
+
+    // Mic Trigger in BEN Voice Core View
+    document.getElementById('jarvis-mic-trigger').addEventListener('click', toggleListening);
+    document.getElementById('canvas-reactor-wrap').addEventListener('click', toggleListening);
+
+    // Toggle Arc Gold ⚡ / Cyber Blue 🌐 Core Energy Theme
+    document.getElementById('theme-color-toggle').addEventListener('click', () => {
+      jarvisTheme = jarvisTheme === 'gold' ? 'cyan' : 'gold';
+      showToast(`Core energy shifted to ${jarvisTheme.toUpperCase()}.`, 'success');
+    });
+
+    // Quick-Prompt Chips
+    document.querySelectorAll('.hero-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        textarea.value = chip.dataset.prompt;
+        resizeTextarea();
+        updateSendBtn();
+        sendMessage();
+      });
+    });
+
+    // ── Memory Management Drawer (Phase 3 & 4) ──────────────────────
+    const memoryDrawer = document.getElementById('memory-drawer');
+    const drawerBackdrop = document.getElementById('drawer-backdrop');
+
+    function openMemoryDrawer() {
+      memoryDrawer.classList.add('open');
+      drawerBackdrop.classList.add('open');
+      loadMemories();
+      loadSessions();
+    }
+    function closeMemoryDrawer() {
+      memoryDrawer.classList.remove('open');
+      drawerBackdrop.classList.remove('open');
+    }
+
+    document.getElementById('memory-btn').addEventListener('click', openMemoryDrawer);
+    document.getElementById('close-drawer-btn').addEventListener('click', closeMemoryDrawer);
+    drawerBackdrop.addEventListener('click', closeMemoryDrawer);
+
+    // Load & Render Core Memories
+    async function loadMemories() {
+      try {
+        const res = await fetch(API.MEMORIES);
+        allMemories = await res.json();
+        const container = document.getElementById('memories-container');
+
+        if (allMemories.length === 0) {
+          container.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:16px;">No saved memories yet.</div>';
+          return;
+        }
+
+        container.innerHTML = allMemories.map(m => `
+          <div class="memory-item">
+            <div class="memory-item-top">
+              <span class="category-pill ${m.category}">${m.category}</span>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-action" style="padding:2px 8px;font-size:11px;" onclick="toggleMemoryItem('${m.id}')">
+                  ${m.active ? '● Active' : '○ Off'}
+                </button>
+                <button class="btn-action" style="padding:2px 8px;font-size:11px;" onclick="deleteMemoryItem('${m.id}')">🗑</button>
+              </div>
+            </div>
+            <div style="font-size:13px;color:#f3f4f6;">${m.content}</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    window.toggleMemoryItem = async (id) => {
+      await fetch(API.MEMORY_TOGGLE(id), { method: 'POST' });
+      await loadMemories();
+    };
+    window.deleteMemoryItem = async (id) => {
+      await fetch(API.MEMORY(id), { method: 'DELETE' });
+      await loadMemories();
+    };
+
+    document.getElementById('save-memory-btn').addEventListener('click', async () => {
+      const text = document.getElementById('new-memory-text').value.trim();
+      const cat = document.getElementById('new-memory-cat').value;
+      if (!text) return;
+
+      await fetch(API.MEMORIES, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: cat, content: text }),
+      });
+      document.getElementById('new-memory-text').value = '';
+      showToast('Saved to BEN long-term memory!', 'success');
+      await loadMemories();
+    });
+
+    // Load Saved Sessions
+    async function loadSessions() {
+      try {
+        const res = await fetch(API.CONVERSATIONS);
+        const sessions = await res.json();
+        const container = document.getElementById('sessions-container');
+
+        if (sessions.length === 0) {
+          container.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:16px;">No saved sessions yet.</div>';
+          return;
+        }
+
+        container.innerHTML = sessions.map(s => `
+          <div class="memory-item" style="cursor:pointer;" onclick="switchSessionItem('${s.id}')">
+            <div style="font-weight:700;font-size:13px;color:#fff;">${s.title || 'Conversation'}</div>
+            <div style="font-size:11px;color:var(--text-dim);">${s.id.slice(0, 8)}… · ${new Date(s.updated_at || s.created_at).toLocaleDateString()}</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    window.switchSessionItem = async (id) => {
+      await fetch(API.SWITCH(id), { method: 'POST' });
+      const res = await fetch(API.CONVERSATION(id));
+      const conv = await res.json();
+
+      const msgs = document.getElementById('messages');
+      msgs.innerHTML = '';
+      if (conv.messages && conv.messages.length > 0) {
+        conv.messages.forEach(m => appendMessage(m.role === 'user' ? 'user' : 'ben', m.content, m.is_error));
+      }
+      closeMemoryDrawer();
+      showToast('Loaded conversation session.', 'success');
+    };
+
+    // ── Toast Notification Helper ───────────────────────────────────
+    let toastTimeout = null;
+    function showToast(msg, type = '') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = `show ${type}`;
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => { toast.className = ''; }, 3200);
+    }
+
+    // ── Initial Boot ────────────────────────────────────────────────
+    (async function init() {
+      await checkStatus();
+      setInterval(checkStatus, 30000);
+      textarea.focus();
+    })();
+  </script>
+</body>
+</html>

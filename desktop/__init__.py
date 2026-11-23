@@ -1,0 +1,1 @@
+"""BEN Desktop Companion package."""

@@ -124,7 +124,7 @@ class AnthropicClientManager:
             kwargs: Dict[str, Any] = {
                 "api_key": self.api_key,
                 "max_retries": 3,
-                "timeout": 30.0,
+                "timeout": 60.0,
             }
             if self.base_url:
                 kwargs["base_url"] = self.base_url
@@ -297,7 +297,7 @@ class AnthropicClientManager:
                 "contents": contents,
                 "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens}
             }
-            r = requests.post(url, json=payload, timeout=30)
+            r = requests.post(url, json=payload, timeout=(10, 60))
             if r.status_code == 200:
                 data = r.json()
                 candidates = data.get("candidates", [])
@@ -359,7 +359,7 @@ class AnthropicClientManager:
                 "contents": contents,
                 "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens}
             }
-            r = requests.post(url, json=payload, stream=True, timeout=30)
+            r = requests.post(url, json=payload, stream=True, timeout=(10, 60))
             if r.status_code != 200:
                 clean_err = redact_sensitive(r.text, self._api_key)
                 raise RuntimeError(f"Gemini stream error (HTTP {r.status_code}): {clean_err[:180]}")

@@ -159,16 +159,21 @@ class Settings(BaseSettings):
 
     @property
     def base_url(self) -> Optional[str]:
-        """Return sanitized optional base URL for Anthropic client if configured."""
+        """Return sanitized optional base URL for Anthropic client if configured.
+
+        Only uses ANTHROPIC_BASE_URL — intentionally does NOT fall back to BASE_URL
+        because that env var is often used for unrelated services (e.g. FreeLLMAPI proxy).
+        """
         raw = (
             self.anthropic_base_url
             or os.environ.get("ANTHROPIC_BASE_URL")
-            or self.base_url_fallback
-            or os.environ.get("BASE_URL")
         )
         if not raw:
             return None
         cleaned = raw.strip().rstrip("/")
+        # Ignore localhost/127.x URLs when running on Vercel (they can't connect anyway)
+        if os.environ.get("VERCEL") and cleaned and ("127.0.0.1" in cleaned or "localhost" in cleaned):
+            return None
         return cleaned if cleaned else None
 
     @property

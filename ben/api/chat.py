@@ -694,7 +694,7 @@ async def stream_message(req: ChatRequest):
                         break
 
                     try:
-                        event_type, payload = await asyncio.wait_for(gen_queue.get(), timeout=30.0)
+                        event_type, payload = await asyncio.wait_for(gen_queue.get(), timeout=120.0)
                     except asyncio.TimeoutError:
                         yield f"data: {json.dumps({'type': 'error', 'detail': 'Response timed out.'})}\n\n"
                         break
